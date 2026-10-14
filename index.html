@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Proyecto LAI: compara la similitud entre programas Python mediante normalización, secuencias de tokens y Merge Sort.">
+  <title>Proyecto LAI — Análisis de similitud</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="identity"><div class="logo" aria-hidden="true">❦</div><div>Proyecto LAI<small>Análisis de similitud · Merge Sort</small></div></div>
+    </header>
+    <section class="hero" aria-label="Presentación">
+      <div>
+        <div class="eyebrow">ANALIZA · ORDENA · COMPARA</div>
+        <h1>Encuentra similitudes entre <em>programas Python.</em></h1>
+        <p class="sub">Carga archivos, compara sus estructuras y explora fragmentos coincidentes. Hecho con <strong>JavaScript puro</strong> y <strong>Merge Sort</strong>, sin instalar nada ni enviar tus archivos a internet.</p>
+      </div>
+      <div class="heroart" aria-hidden="true">
+        <div class="poster-word">ANALIZA.<br>ORDENA.<br>COMPARA.</div>
+        <div class="artbar"><i></i><i></i><i></i></div>
+        <div class="fakecode"><span class="dim">01</span> &nbsp;<span class="kw">IDENTIFICAR</span> TOKENS<br><span class="dim">02</span> &nbsp;<span class="nm">NORMALIZAR</span> CÓDIGO<br><span class="dim">03</span> &nbsp;<span class="kw">MERGE SORT</span> ORDENAR<br><span class="dim">04</span> &nbsp;<span class="nm">COMPARAR</span> FRAGMENTOS</div>
+        <div class="arrowtext">↗ PATRONES / COINCIDENCIAS / RESULTADOS</div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <article class="panel">
+        <div class="headline"><h2>01. Archivos para comparar</h2><span class="count" id="fileCount">0 archivos</span></div>
+        <p class="hint">Sube archivos Python o escribe tu propio código. Puedes combinar ambos métodos para comparar dos o más programas.</p>
+        <div id="dropzone" class="drop" role="button" tabindex="0" aria-label="Seleccionar o arrastrar archivos Python">
+          <div class="drop-icon">⇧</div>
+          <strong>Arrastra tus archivos .py aquí</strong>
+          <span>O haz clic para seleccionarlos · Máx. 30 archivos, 1 MB cada uno</span>
+        </div>
+        <input id="fileInput" type="file" accept=".py,text/x-python" multiple hidden>
+        <div class="btnrow"><button class="btn ghost" id="clearBtn" type="button" title="Eliminar archivos, código escrito y resultados">↺ Start Over</button></div>
+        <div id="filesList" class="selected-files" aria-live="polite"><p class="empty">Todavía no has agregado archivos.</p></div>
+        <div id="fileError" class="error" role="alert"></div>
+        <hr class="divider">
+        <h2>O escribe tu código directamente</h2>
+        <p class="hint">Pega o escribe un programa Python y pulsa «Añadir código». Repite para comparar varios programas.</p>
+        <div class="field"><label class="label" for="snippetName">Nombre del archivo</label><input class="input" id="snippetName" maxlength="80" placeholder="archivo.py (opcional)"></div>
+        <div class="field"><label class="label" for="snippetCode">Código Python</label><textarea id="snippetCode" spellcheck="false" placeholder="Escribe o pega tu código Python aquí…"></textarea></div>
+        <button class="btn" id="addSnippetBtn">+ Añadir código</button>
+      </article>
+
+      <aside class="panel">
+        <div class="headline"><h2>02. Configuración</h2></div>
+        <div class="field">
+          <label class="label" for="gramSize">Tamaño de los fragmentos</label>
+          <select id="gramSize"><option value="3">3 tokens · Más sensible</option><option value="5" selected>5 tokens · Equilibrado</option><option value="7">7 tokens · Más estricto</option></select>
+          <p class="hint" style="margin:6px 0 0;">A mayor tamaño, se necesitan secuencias más largas para coincidir.</p>
+        </div>
+        <div class="field">
+          <label class="label" for="similarityView">¿Qué se mide?</label>
+          <div id="similarityView" class="info" style="margin-top:0;">70% coincidencia de secuencias de tokens + 30% coincidencia del conjunto de tokens con repeticiones. En ambos casos, los elementos se ordenan mediante <strong>Merge Sort</strong>.</div>
+        </div>
+        <div class="actionwrap"><button class="btn primary full" id="analyzeBtn" disabled>⌁ Analizar similitud</button><button class="btn ghost full" id="exportBtn" disabled>⇩ Exportar resultados CSV</button></div>
+        <div class="info"><strong>Privacidad:</strong> nada se sube a un servidor. Los archivos se procesan dentro de tu navegador y desaparecen al cerrar o recargar la página.</div>
+        <div class="info"><strong>Advertencia académica:</strong> similitud no equivale a plagio. Los resultados requieren interpretación humana, especialmente en tareas cortas o con instrucciones similares.</div>
+      </aside>
+    </section>
+
+    <section id="results" class="section hidden" aria-live="polite">
+      <div class="sectiontitle"><h2>03. Resultados del análisis</h2><span class="muted" style="font-size:12px">Ordenados de mayor a menor con Merge Sort</span></div>
+      <div class="statgrid"><div class="stat"><span>Archivos</span><b id="statFiles">0</b><small>Programas analizados</small></div><div class="stat"><span>Comparaciones</span><b id="statPairs">0</b><small>Pares evaluados</small></div><div class="stat"><span>Mayor similitud</span><b id="statTop">0%</b><small>Resultado más alto</small></div></div>
+      <div class="panel"><div class="sectiontitle"><h2 style="font-size:16px">Clasificación por similitud</h2><span class="count" id="operationStats">0 comparaciones de Merge Sort</span></div>
+        <div class="tablewrap"><table><thead><tr><th>Archivos</th><th>Similitud</th><th>Visualización</th><th>Detalle</th></tr></thead><tbody id="resultsBody"></tbody></table></div>
+      </div>
+      <div id="comparePanel" class="panel section hidden">
+        <div class="compare-head"><h3 id="pairTitle">Comparación</h3><span class="score" id="pairScore">0%</span></div>
+        <div class="mini-details" id="pairMeta"></div>
+        <div class="codes"><div class="codebox"><div class="codeheading" id="codeNameA">Archivo A</div><pre><code id="codeA"></code></pre></div><div class="codebox"><div class="codeheading" id="codeNameB">Archivo B</div><pre><code id="codeB"></code></pre></div></div>
+        <div class="legend"><i></i> Se resaltan fragmentos cuyos tokens normalizados aparecen en ambos códigos (no necesariamente texto idéntico).</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sectiontitle"><h2>¿Dónde entra Merge Sort?</h2></div>
+      <div class="method"><div class="step"><b>01 · LEER</b><h3>Tokenizar</h3><p>Separar operadores, palabras clave, valores e identificadores.</p></div><div class="step"><b>02 · NORMALIZAR</b><h3>Ignorar nombres</h3><p>Variables → ID, números → NUM, cadenas → STR.</p></div><div class="step"><b>03 · ORDENAR</b><h3>Merge Sort</h3><p>Ordenar listas de tokens y fragmentos de tokens en O(n log n).</p></div><div class="step"><b>04 · COMPARAR</b><h3>Dos punteros</h3><p>Contar coincidencias en las listas ordenadas y calcular el porcentaje.</p></div></div>
+    </section>
+    <footer class="footer site-credits">
+      <div class="footer-brand">
+        <span class="footer-seal" aria-hidden="true">❦</span>
+        <div class="footer-brand-text">
+          <span class="footer-kicker">AUTORÍA DEL PROYECTO</span>
+          <strong>Creado por T4VO</strong>
+          <small>Proyecto LAI · Merge Sort</small>
+        </div>
+      </div>
+      <a class="footer-github" href="https://github.com/T4VO11" target="_blank" rel="noopener noreferrer" aria-label="Visitar el GitHub de proyectos de T4VO">
+        <span class="github-mark" aria-hidden="true">⌘</span>
+        <span class="github-label"><small>MIS PROYECTOS</small><b>GitHub / T4VO11</b></span>
+        <span class="github-arrow" aria-hidden="true">↗</span>
+      </a>
+    </footer>
+  </main>
+
+<script>
+'use strict';
+const MAX_FILES = 30;
+const MAX_FILE_BYTES = 1024 * 1024;
+const PY_KEYWORDS = new Set(('False None True and as assert async await break case class continue def del elif else except finally for from global if import in is lambda match nonlocal not or pass raise return try while with yield').split(' '));
+const PY_BUILTINS = new Set(('print range len sum input int float str bool list dict set tuple max min abs zip enumerate sorted reversed type isinstance open super round all any map filter').split(' '));
+const $ = (id) => document.getElementById(id);
+let files = [];
+let pairs = [];
+let nextId = 1;
+
+function mergeSort(items, comparator = defaultCompare, metrics = null) {
+  if (metrics) metrics.calls = (metrics.calls || 0) + 1;
+  if (items.length < 2) return items.slice();
+  const middle = Math.floor(items.length / 2);
+  const left = mergeSort(items.slice(0, middle), comparator, metrics);
+  const right = mergeSort(items.slice(middle), comparator, metrics);
+  const output = [];
+  let i = 0, j = 0;
+  if (metrics) metrics.merges = (metrics.merges || 0) + 1;
+  while (i < left.length && j < right.length) {
+    if (metrics) metrics.comparisons = (metrics.comparisons || 0) + 1;
+    if (comparator(left[i], right[j]) <= 0) output.push(left[i++]);
+    else output.push(right[j++]);
+  }
+  while (i < left.length) output.push(left[i++]);
+  while (j < right.length) output.push(right[j++]);
+  return output;
+}
+function defaultCompare(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
+
+function tokenizePython(source) {
+  const result = [];
+  const isStart = ch => /[A-Za-z_\u00C0-\u024F]/.test(ch || '');
+  const isPart = ch => /[A-Za-z0-9_\u00C0-\u024F]/.test(ch || '');
+  const n = source.length;
+  let i = 0;
+  while (i < n) {
+    const start = i;
+    const c = source[i];
+    if (/\s/.test(c)) { i++; continue; }
+    if (c === '#') { while (i < n && source[i] !== '\n') i++; continue; }
+    const prefixMatch = /^[rRuUbBfF]{1,3}(?=['"])/.exec(source.slice(i, i + 5));
+    let qPos = i;
+    if (prefixMatch && isStart(c)) qPos = i + prefixMatch[0].length;
+    if (source[qPos] === '"' || source[qPos] === "'") {
+      const quote = source[qPos];
+      const triple = source.slice(qPos, qPos + 3) === quote.repeat(3);
+      const delimiter = quote.repeat(triple ? 3 : 1);
+      i = qPos + delimiter.length;
+      while (i < n) {
+        if (source[i] === '\\') { i += 2; continue; }
+        if (source.slice(i, i + delimiter.length) === delimiter) { i += delimiter.length; break; }
+        i++;
+      }
+      result.push({value:'STR', start, end:Math.min(i,n)});
+      continue;
+    }
+    if (isStart(c)) {
+      i++;
+      while (i < n && isPart(source[i])) i++;
+      const word = source.slice(start, i);
+      const value = PY_KEYWORDS.has(word) || PY_BUILTINS.has(word) ? word : 'ID';
+      result.push({value,start,end:i});
+      continue;
+    }
+    if (/[0-9]/.test(c)) {
+      i++;
+      while (i < n && /[A-Za-z0-9_.]/.test(source[i])) i++;
+      result.push({value:'NUM',start,end:i});
+      continue;
+    }
+    const op = ['**=','//=','<<=','>>=','...','==','!=','<=','>=','->','+=','-=','*=','/=','%=','//','**','<<','>>','&=','|=','^=','@=','//=',':='].find(x => source.startsWith(x, i));
+    if (op) {i += op.length; result.push({value:op,start,end:i});continue;}
+    i++;
+    result.push({value:c,start,end:i});
+  }
+  return result;
+}
+
+function shingles(tokens, size) {
+  const out = [];
+  if (tokens.length < size) return tokens.map((t,index)=>({key:t.value,from:index,to:index}));
+  for (let i=0;i+size<=tokens.length;i++) {
+    out.push({key:tokens.slice(i,i+size).map(t=>t.value).join('\u241F'),from:i,to:i+size-1});
+  }
+  return out;
+}
+
+function commonCount(sortedA, sortedB) {
+  let i=0,j=0,count=0;
+  while(i<sortedA.length&&j<sortedB.length){
+    const cmp=defaultCompare(sortedA[i],sortedB[j]);
+    if(cmp===0){count++;i++;j++;}
+    else if(cmp<0)i++;else j++;
+  }
+  return count;
+}
+function dice(count,a,b){return a+b === 0 ? 0 : 200*count/(a+b);}
+function evaluate(A,B,k,metrics) {
+  const aTokens=A.tokens, bTokens=B.tokens;
+  const sortedATokens=mergeSort(aTokens.map(t=>t.value),defaultCompare,metrics);
+  const sortedBTokens=mergeSort(bTokens.map(t=>t.value),defaultCompare,metrics);
+  const sharedTokens=commonCount(sortedATokens,sortedBTokens);
+  const tokenScore=dice(sharedTokens,aTokens.length,bTokens.length);
+  const effectiveK = aTokens.length < k || bTokens.length < k ? 1 : k;
+  const seqA=shingles(aTokens,effectiveK),seqB=shingles(bTokens,effectiveK);
+  const aKeys=mergeSort(seqA.map(w=>w.key),defaultCompare,metrics);
+  const bKeys=mergeSort(seqB.map(w=>w.key),defaultCompare,metrics);
+  const sharedSequences=commonCount(aKeys,bKeys);
+  const sequenceScore=dice(sharedSequences,seqA.length,seqB.length);
+  const weight=(aTokens.length>=k && bTokens.length>=k)?0.7:0;
+  const score=Math.round((weight*sequenceScore+(1-weight)*tokenScore)*10)/10;
+  const commonSignatures = new Set();
+  let x=0,y=0;
+  while (x<aKeys.length&&y<bKeys.length){
+    const cmp=defaultCompare(aKeys[x],bKeys[y]);
+    if(cmp===0){commonSignatures.add(aKeys[x]);x++;y++;}
+    else if(cmp<0)x++;else y++;
+  }
+  return {a:A,b:B,score,tokenScore,sequenceScore,sharedTokens,sharedSequences,seqA,seqB,commonSignatures,k:effectiveK};
+}
+
+function escapeHtml(text) {return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function formatNum(n){return n.toLocaleString('es-MX');}
+function classify(score){return score>=70?'high':score>=40?'medium':'';}
+function updateUI(){
+  $('fileCount').textContent=`${files.length} archivo${files.length===1?'':'s'}`;
+  $('analyzeBtn').disabled=files.length<2;
+  const list=$('filesList');
+  list.innerHTML='';
+  if(!files.length){list.innerHTML='<p class="empty">Todavía no has agregado archivos.</p>';return;}
+  for(const f of files){
+    const row=document.createElement('div');row.className='file';
+    row.innerHTML=`<div class="file-icon">PY</div><div class="grow"><div class="filename">${escapeHtml(f.name)}</div><div class="filemeta">${formatNum(f.tokens.length)} tokens · ${(new Blob([f.source]).size/1024).toFixed(1)} KB</div></div><button type="button" class="remove" title="Quitar archivo" aria-label="Quitar ${escapeHtml(f.name)}">✕</button>`;
+    row.querySelector('button').addEventListener('click',()=>{files=files.filter(item=>item.id!==f.id);invalidate();updateUI();});
+    list.appendChild(row);
+  }
+}
+function invalidate(){pairs=[];$('results').classList.add('hidden');$('comparePanel').classList.add('hidden');$('exportBtn').disabled=true;}
+function error(message){$('fileError').textContent=message;}
+function insertFile(name,source){
+  if(files.length>=MAX_FILES){return `El límite es de ${MAX_FILES} archivos.`;}
+  if(!name.toLowerCase().endsWith('.py'))return `Solo se admiten archivos .py: ${name}`;
+  if(new Blob([source]).size>MAX_FILE_BYTES)return `Archivo demasiado grande: ${name} (máximo 1 MB).`;
+  if(!source.trim())return `El archivo ${name} está vacío.`;
+  files.push({id:nextId++,name,source,tokens:tokenizePython(source)});
+  invalidate();
+  return null;
+}
+async function readFiles(list){
+  error('');
+  const errors=[];
+  for(const file of list){
+    if(file.size>MAX_FILE_BYTES){errors.push(`Demasiado grande: ${file.name}`);continue;}
+    try{const issue=insertFile(file.name,await file.text());if(issue)errors.push(issue);}
+    catch(e){errors.push(`No se pudo leer ${file.name}: ${e.message}`);}
+  }
+  error(errors.join(' | '));updateUI();
+}
+function highlightSource(file,windows,commonSignatures){
+  const marked=new Array(file.tokens.length).fill(false);
+  for(const window of windows){
+    if(!commonSignatures.has(window.key))continue;
+    for(let i=window.from;i<=window.to;i++)marked[i]=true;
+  }
+  const ranges=[];
+  for(let i=0;i<file.tokens.length;i++) if(marked[i]) {
+    const t=file.tokens[i];
+    if(ranges.length && t.start<=ranges[ranges.length-1].end+1)ranges[ranges.length-1].end=t.end;
+    else ranges.push({start:t.start,end:t.end});
+  }
+  let html='',pos=0;
+  for(const r of ranges){
+    html+=escapeHtml(file.source.slice(pos,r.start));
+    html+='<mark>'+escapeHtml(file.source.slice(r.start,r.end))+'</mark>';
+    pos=r.end;
+  }
+  return html+escapeHtml(file.source.slice(pos));
+}
+function showPair(pairIndex,scroll=true){
+  const pair=pairs[pairIndex];if(!pair)return;
+  $('comparePanel').classList.remove('hidden');
+  $('pairTitle').textContent=`${pair.a.name} vs. ${pair.b.name}`;
+  $('pairScore').textContent=`${pair.score.toFixed(1)}%`;
+  $('pairScore').className='score '+classify(pair.score);
+  $('pairMeta').textContent='';
+  [ `Tokens iguales: ${pair.sharedTokens}`,`Secuencias iguales: ${pair.sharedSequences}`,`Similitud de tokens: ${pair.tokenScore.toFixed(1)}%`,`Similitud de secuencias: ${pair.sequenceScore.toFixed(1)}%`].forEach(info=>{const span=document.createElement('span');span.textContent=info;$('pairMeta').appendChild(span);});
+  $('codeNameA').textContent=pair.a.name;
+  $('codeNameB').textContent=pair.b.name;
+  $('codeA').innerHTML=highlightSource(pair.a,pair.seqA,pair.commonSignatures);
+  $('codeB').innerHTML=highlightSource(pair.b,pair.seqB,pair.commonSignatures);
+  if(scroll)$('comparePanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function analyze(){
+  error('');
+  if(files.length<2){error('Agrega por lo menos dos archivos.');return;}
+  const k=Number($('gramSize').value);
+  const metrics={calls:0,merges:0,comparisons:0};
+  const unsorted=[];
+  for(let i=0;i<files.length;i++)for(let j=i+1;j<files.length;j++)unsorted.push(evaluate(files[i],files[j],k,metrics));
+  pairs=mergeSort(unsorted,(a,b)=>b.score-a.score || defaultCompare(a.a.name,b.a.name)||defaultCompare(a.b.name,b.b.name),metrics);
+  $('statFiles').textContent=files.length;
+  $('statPairs').textContent=pairs.length;
+  $('statTop').textContent=pairs.length?`${pairs[0].score.toFixed(1)}%`:'0%';
+  $('operationStats').textContent=`${formatNum(metrics.comparisons)} comparaciones internas de Merge Sort`;
+  const table=$('resultsBody');table.innerHTML='';
+  pairs.forEach((p,idx)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><strong>${escapeHtml(p.a.name)}</strong><br><span class="muted">vs. ${escapeHtml(p.b.name)}</span></td><td><span class="score ${classify(p.score)}">${p.score.toFixed(1)}%</span></td><td><div class="bar"><span style="width:${p.score}%"></span></div></td><td><button type="button" class="row-link">Ver fragmentos ↗</button></td>`;
+    tr.querySelector('button').addEventListener('click',()=>showPair(idx));
+    table.appendChild(tr);
+  });
+  $('results').classList.remove('hidden');
+  $('exportBtn').disabled=false;
+  showPair(0,false);
+  $('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function csvCell(str){
+  let s=String(str);
+  if(/^[\s]*[=+@\-]/.test(s)) s="'"+s;
+  return '"'+s.replace(/"/g,'""')+'"';
+}
+function exportCSV(){
+  if(!pairs.length)return;
+  const rows=[['Archivo A','Archivo B','Similitud (%)','Tokens comunes','Secuencias comunes','Puntuación tokens (%)','Puntuación secuencias (%)']];
+  for(const p of pairs)rows.push([p.a.name,p.b.name,p.score,p.sharedTokens,p.sharedSequences,p.tokenScore.toFixed(1),p.sequenceScore.toFixed(1)]);
+  const content='\uFEFF'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+  const url=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8'}));
+  const anchor=document.createElement('a');anchor.href=url;anchor.download='proyecto_lai_resultados.csv';document.body.appendChild(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$('dropzone').addEventListener('click',()=>$('fileInput').click());
+$('dropzone').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('fileInput').click();}});
+$('dropzone').addEventListener('dragover',e=>{e.preventDefault();$('dropzone').classList.add('dragover');});
+$('dropzone').addEventListener('dragleave',()=>$('dropzone').classList.remove('dragover'));
+$('dropzone').addEventListener('drop',e=>{e.preventDefault();$('dropzone').classList.remove('dragover');readFiles(e.dataTransfer.files);});
+$('fileInput').addEventListener('change',e=>{const selected=Array.from(e.target.files);e.target.value='';readFiles(selected);});
+function startOver(){
+  files=[];
+  pairs=[];
+  nextId=1;
+  $('fileInput').value='';
+  $('snippetName').value='';
+  $('snippetCode').value='';
+  $('gramSize').value='5';
+  $('resultsBody').replaceChildren();
+  $('pairMeta').replaceChildren();
+  $('codeA').textContent='';
+  $('codeB').textContent='';
+  $('pairTitle').textContent='Comparación';
+  $('pairScore').textContent='0%';
+  $('statFiles').textContent='0';
+  $('statPairs').textContent='0';
+  $('statTop').textContent='0%';
+  $('operationStats').textContent='0 comparaciones de Merge Sort';
+  error('');
+  invalidate();
+  updateUI();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('clearBtn').addEventListener('click',startOver);
+$('addSnippetBtn').addEventListener('click',()=>{
+  error('');
+  let name=$('snippetName').value.trim()||`codigo_${nextId}.py`;
+  if(!name.toLowerCase().endsWith('.py'))name+='.py';
+  const issue=insertFile(name,$('snippetCode').value);
+  if(issue)error(issue);else{$('snippetCode').value='';$('snippetName').value='';}
+  updateUI();
+});
+$('analyzeBtn').addEventListener('click',analyze);
+$('exportBtn').addEventListener('click',exportCSV);
+$('gramSize').addEventListener('change',()=>{invalidate();updateUI();});
+updateUI();
+</script>
+</body>
+</html>
