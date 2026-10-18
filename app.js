@@ -11,6 +11,14 @@ const PY_BUILTINS = new Set(
   'print range len sum input int float str bool list dict set tuple max min abs zip enumerate sorted reversed type isinstance open super round all any map filter'.split(' ')
 );
 
+const CPP_KEYWORDS = new Set(
+  'alignas alignof and and_eq asm atomic_cancel atomic_commit atomic_noexcept auto bitand bitor bool break case catch char char8_t char16_t char32_t class compl concept const consteval constexpr constinit const_cast continue co_await co_return co_yield decltype default delete do double dynamic_cast else enum explicit export extern false float for friend goto if inline int long mutable namespace new noexcept not not_eq nullptr operator or or_eq private protected public reflexpr register reinterpret_cast requires return short signed sizeof static static_assert static_cast struct switch synchronized template this thread_local throw true try typedef typeid typename union unsigned using virtual void volatile wchar_t while xor xor_eq'.split(' ')
+);
+
+const CPP_BUILTINS = new Set(
+  'cin cout cerr clog string vector map set list endl printf scanf malloc free std'.split(' ')
+);
+
 const $ = (id) => document.getElementById(id);
 
 let files = [];
@@ -50,17 +58,19 @@ function mergeSort(items, comparator = defaultCompare, metrics = null) {
   return output;
 }
 
-function tokenizePython(source) {
+function tokenizeCode(source, ext) {
   const result = [];
   const isStart = (ch) => /[A-Za-z_\u00C0-\u024F]/.test(ch || '');
   const isPart = (ch) => /[A-Za-z0-9_\u00C0-\u024F]/.test(ch || '');
   const n = source.length;
   let i = 0;
 
+  const isPy = ext === 'py';
+
   const operators = [
     '**=', '//=', '<<=', '>>=', '...', '==', '!=', '<=', '>=', '->',
     '+=', '-=', '*=', '/=', '%=', '//', '**', '<<', '>>', '&=',
-    '|=', '^=', '@=', ':='
+    '|=', '^=', '@=', ':=', '&&', '||', '++', '--', '::'
   ];
 
   while (i < n) {
@@ -72,12 +82,27 @@ function tokenizePython(source) {
       continue;
     }
 
-    if (c === '#') {
+    if (isPy && c === '#') {
       while (i < n && source[i] !== '\n') i++;
       continue;
     }
 
-    const prefixMatch = /^[rRuUbBfF]{1,3}(?=['"])/.exec(source.slice(i, i + 5));
+    if (!isPy && c === '/' && source[i + 1] === '/') {
+      while (i < n && source[i] !== '\n') i++;
+      continue;
+    }
+
+    if (!isPy && c === '/' && source[i + 1] === '*') {
+      i += 2;
+      while (i < n && !(source[i - 1] === '*' && source[i] === '/')) i++;
+      i++;
+      continue;
+    }
+
+    const prefixMatch = isPy
+      ? /^[rRuUbBfF]{1,3}(?=['"])/.exec(source.slice(i, i + 5))
+      : /^[uU8LR]{1,2}(?=['"])/.exec(source.slice(i, i + 3));
+
     let qPos = i;
     if (prefixMatch && isStart(c)) {
       qPos = i + prefixMatch[0].length;
@@ -85,7 +110,7 @@ function tokenizePython(source) {
 
     if (source[qPos] === '"' || source[qPos] === "'") {
       const quote = source[qPos];
-      const triple = source.slice(qPos, qPos + 3) === quote.repeat(3);
+      const triple = isPy && source.slice(qPos, qPos + 3) === quote.repeat(3);
       const delimiter = quote.repeat(triple ? 3 : 1);
       i = qPos + delimiter.length;
 
@@ -109,8 +134,15 @@ function tokenizePython(source) {
       i++;
       while (i < n && isPart(source[i])) i++;
       const word = source.slice(start, i);
-      const value = PY_KEYWORDS.has(word) || PY_BUILTINS.has(word) ? word : 'ID';
-      result.push({ value, start, end: i });
+
+      let val = 'ID';
+      if (isPy && (PY_KEYWORDS.has(word) || PY_BUILTINS.has(word))) {
+        val = word;
+      } else if (!isPy && (CPP_KEYWORDS.has(word) || CPP_BUILTINS.has(word))) {
+        val = word;
+      }
+
+      result.push({ value: val, start, end: i });
       continue;
     }
 
@@ -264,8 +296,13 @@ function updateUI() {
   for (const f of files) {
     const row = document.createElement('div');
     row.className = 'file';
+
+    const parts = f.name.split('.');
+    const ext = parts.length > 1 ? parts[parts.length - 1].toUpperCase() : 'PY';
+    const iconText = ext.length > 3 ? ext.substring(0, 3) : ext;
+
     row.innerHTML = `
-      <div class="file-icon">PY</div>
+      <div class="file-icon">${iconText}</div>
       <div class="grow">
         <div class="filename">${escapeHtml(f.name)}</div>
         <div class="filemeta">${formatNum(f.tokens.length)} tokens · ${(new Blob([f.source]).size / 1024).toFixed(1)} KB</div>
@@ -295,8 +332,13 @@ function insertFile(name, source) {
   if (files.length >= MAX_FILES) {
     return `El límite es de ${MAX_FILES} archivos.`;
   }
-  if (!name.toLowerCase().endsWith('.py')) {
-    return `Solo se admiten archivos .py: ${name}`;
+
+  const parts = name.split('.');
+  const ext = parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
+  const validExts = ['py', 'c', 'cpp', 'h', 'hpp'];
+
+  if (!validExts.includes(ext)) {
+    return `Formatos admitidos (.py, .c, .cpp, .h, .hpp): ${name}`;
   }
   if (new Blob([source]).size > MAX_FILE_BYTES) {
     return `Archivo demasiado grande: ${name} (máximo 1 MB).`;
@@ -309,7 +351,7 @@ function insertFile(name, source) {
     id: nextId++,
     name,
     source,
-    tokens: tokenizePython(source)
+    tokens: tokenizeCode(source, ext)
   });
   invalidate();
   return null;
@@ -339,9 +381,9 @@ async function readFiles(list) {
 function highlightSource(file, windows, commonSignatures) {
   const marked = new Array(file.tokens.length).fill(false);
 
-  for (const window of windows) {
-    if (!commonSignatures.has(window.key)) continue;
-    for (let i = window.from; i <= window.to; i++) {
+  for (const win of windows) {
+    if (!commonSignatures.has(win.key)) continue;
+    for (let i = win.from; i <= win.to; i++) {
       marked[i] = true;
     }
   }
@@ -548,7 +590,13 @@ $('clearBtn').addEventListener('click', startOver);
 $('addSnippetBtn').addEventListener('click', () => {
   error('');
   let name = $('snippetName').value.trim() || `codigo_${nextId}.py`;
-  if (!name.toLowerCase().endsWith('.py')) name += '.py';
+
+  const extMatch = name.match(/\.([a-z0-9]+)$/i);
+  const validExts = ['py', 'c', 'cpp', 'h', 'hpp'];
+
+  if (!extMatch || !validExts.includes(extMatch[1].toLowerCase())) {
+    name += '.py';
+  }
 
   const issue = insertFile(name, $('snippetCode').value);
   if (issue) {
