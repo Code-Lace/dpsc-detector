@@ -13,20 +13,26 @@
   <main class="shell">
     <header class="topbar">
       <div class="identity">
-        <div class="logo" aria-hidden="true">❦</div>
+        <div class="logo-container" aria-hidden="true">
+          <img src="logo.png" alt="Code & Lace Logo" class="brand-logo">
+        </div>
         <div>
           Proyecto CODE LACE
-          <small>Análisis de similitud_ Greedy And Merge Sort</small>
+          <small>DPSC · Detector de Plagio y Similitud de Código</small>
         </div>
       </div>
+      <nav class="top-nav">
+        <a href="#analizador">Analizador</a>
+        <a href="#about-dpsc">Sobre DPSC</a>
+      </nav>
     </header>
 
     <section class="hero" aria-label="Presentación">
       <div>
-        <div class="eyebrow">ANALIZA · ORDENA · COMPARA</div>
-        <h1>Encuentra similitudes entre <em>programas Python, C, C++</em></h1>
+        <div class="eyebrow">DPSC · ANÁLISIS ACADÉMICO</div>
+        <h1>Detector de Plagio y Similitud de <em>Código Fuente</em></h1>
         <p class="sub">
-          Carga archivos, compara sus estructuras y explora fragmentos coincidentes. Hecho con <strong>JavaScript puro</strong> y <strong>Merge Sort</strong>, sin instalar nada ni enviar tus archivos a internet.
+          Herramienta automatizada creada por <strong>Code Lace</strong> para combatir la ofuscación de variables y funciones en tareas de programación en <strong>Python, C y C++</strong>, optimizando el tiempo de los evaluadores académicos.
         </p>
       </div>
       <div class="heroart" aria-hidden="true">
@@ -208,6 +214,25 @@
       </div>
     </section>
 
+    <section id="about-dpsc" class="panel section">
+      <h2>Acerca del Proyecto DPSC</h2>
+      <p class="hint">Solución integral desarrollada para entornos universitarios (CUCEI / Análisis de Algoritmos).</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 16px;">
+        <div style="background: #fff; padding: 16px; border-radius: 12px; border: 1px solid var(--mauve);">
+          <strong style="display: block; margin-bottom: 6px; font-family: var(--title); font-size: 18px;">El Problema</strong>
+          <p style="margin: 0; font-size: 13px; color: var(--muted);">La revisión manual de tareas es lenta y vulnerable a la ofuscación (cambio de nombres o reordenamiento de funciones para ocultar copias).</p>
+        </div>
+        <div style="background: #fff; padding: 16px; border-radius: 12px; border: 1px solid var(--mauve);">
+          <strong style="display: block; margin-bottom: 6px; font-family: var(--title); font-size: 18px;">Nuestra Solución (DPSC)</strong>
+          <p style="margin: 0; font-size: 13px; color: var(--muted);">Un sistema web local con interfaz gráfica que procesa, tokeniza y contrasta los bloques lógicos usando Merge Sort y métricas de similitud.</p>
+        </div>
+        <div style="background: #fff; padding: 16px; border-radius: 12px; border: 1px solid var(--mauve);">
+          <strong style="display: block; margin-bottom: 6px; font-family: var(--title); font-size: 18px;">Integridad Académica</strong>
+          <p style="margin: 0; font-size: 13px; color: var(--muted);">Garantiza evaluaciones justas y transparentes, reduciendo la carga de trabajo y los errores humanos de los auxiliares y profesores.</p>
+        </div>
+      </div>
+  </section>
+
     <footer class="footer site-credits">
       <div class="footer-brand">
         <span class="footer-seal" aria-hidden="true">❦</span>
@@ -217,7 +242,7 @@
           <small>Proyecto CODE LACE · Merge Sort</small>
         </div>
       </div>
-      <a>
+      <a href="https://github.com/Code-Lace/dpsc-detector" class="footer-github" target="_blank" rel="noopener">
         <span class="github-mark" aria-hidden="true">⌘</span>
         <span class="github-label">
           <small>MIS PROYECTOS</small>
