@@ -7,6 +7,7 @@
   <meta name="description" content="Proyecto CODE LACE: compara la similitud entre programas Python mediante normalización, secuencias de tokens y Merge Sort.">
   <title>Proyecto CODE LACE — Análisis de similitud</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="algorithms/greedy.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -113,7 +114,7 @@
           <button class="btn ghost full" id="exportBtn" type="button" disabled>⇩ Exportar resultados CSV</button>
         </div>
         <div class="info">
-          <strong>Privacidad:</strong> la similitud se calcula en tu navegador. Al abrir una comparación, se envían tokens normalizados a Vercel para analizar bloques con Greedy. Nuestra API no guarda los tokens ni ejecuta los programas.
+          <strong>Privacidad:</strong> todo el análisis, incluido Greedy, se realiza en tu navegador. No se envían archivos ni tokens a un servidor y los programas no se ejecutan. Los datos desaparecen al cerrar o recargar la página.
         </div>
         <div class="info">
           <strong>Advertencia académica:</strong> similitud no equivale a plagio. Los resultados requieren interpretación humana, especialmente en tareas cortas o con instrucciones similares.
