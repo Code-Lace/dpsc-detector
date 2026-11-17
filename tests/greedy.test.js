@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const { greedyMatch } = require('../frontend/algorithms/greedy.js');
+const { greedyMatch } = require('../frontend-backend/algorithms/greedy.js');
 const tokens = text => [...text];
 
 test('programas idénticos y cobertura completa', async () => {
@@ -65,8 +65,8 @@ function appContext() {
     document: { getElementById(id) { if (!nodes.has(id)) nodes.set(id, element()); return nodes.get(id); }, createElement: element },
     fetch() { throw new Error('No se permiten peticiones de red en el análisis.'); }
   });
-  vm.runInContext(fs.readFileSync('frontend/algorithms/greedy.js', 'utf8'), context);
-  vm.runInContext(fs.readFileSync('frontend/app.js', 'utf8'), context);
+  vm.runInContext(fs.readFileSync('frontend-backend/algorithms/greedy.js', 'utf8'), context);
+  vm.runInContext(fs.readFileSync('frontend-backend/app.js', 'utf8'), context);
   context.sampleA = fs.readFileSync('ejemplos/alumno_ana.py', 'utf8');
   context.sampleB = fs.readFileSync('ejemplos/alumno_bruno.py', 'utf8');
   vm.runInContext('insertFile("ana.py", sampleA); insertFile("bruno.py", sampleB); pairs = [evaluate(files[0], files[1], 5, {})];', context);
