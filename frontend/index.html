@@ -113,7 +113,7 @@
           <button class="btn ghost full" id="exportBtn" type="button" disabled>⇩ Exportar resultados CSV</button>
         </div>
         <div class="info">
-          <strong>Privacidad:</strong> nada se sube a un servidor. Los archivos se procesan dentro de tu navegador y desaparecen al cerrar o recargar la página.
+          <strong>Privacidad:</strong> la similitud se calcula en tu navegador. Al abrir una comparación, se envían tokens normalizados a Vercel para analizar bloques con Greedy. Nuestra API no guarda los tokens ni ejecuta los programas.
         </div>
         <div class="info">
           <strong>Advertencia académica:</strong> similitud no equivale a plagio. Los resultados requieren interpretación humana, especialmente en tareas cortas o con instrucciones similares.
@@ -171,6 +171,7 @@
           <span class="score" id="pairScore">0%</span>
         </div>
         <div class="mini-details" id="pairMeta"></div>
+        <p id="greedyStatus" class="hint" role="status" aria-live="polite"></p>
         <div class="codes">
           <div class="codebox">
             <div class="codeheading" id="codeNameA">Archivo A</div>
@@ -182,7 +183,7 @@
           </div>
         </div>
         <div class="legend">
-          <i></i> Se resaltan fragmentos cuyos tokens normalizados aparecen en ambos códigos (no necesariamente texto idéntico).
+          <i></i> <span id="fragmentLegend">Se resaltan fragmentos cuyos tokens normalizados aparecen en ambos códigos.</span>
         </div>
       </div>
     </section>

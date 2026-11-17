@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "",
+  "outputDirectory": "frontend",
+  "functions": {
+    "api/greedy.py": {
+      "maxDuration": 10,
+      "includeFiles": "backend/**"
+    }
+  }
+}

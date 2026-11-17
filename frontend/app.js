@@ -24,6 +24,8 @@ const $ = (id) => document.getElementById(id);
 let files = [];
 let pairs = [];
 let nextId = 1;
+let greedyRequest = null;
+let visiblePair = null;
 
 function defaultCompare(a, b) {
   return a < b ? -1 : a > b ? 1 : 0;
@@ -319,6 +321,8 @@ function updateUI() {
 }
 
 function invalidate() {
+  if (greedyRequest) greedyRequest.abort();
+  visiblePair = null;
   pairs = [];
   $('results').classList.add('hidden');
   $('comparePanel').classList.add('hidden');$('exportBtn').disabled = true;
@@ -382,7 +386,7 @@ function highlightSource(file, windows, commonSignatures) {
   const marked = new Array(file.tokens.length).fill(false);
 
   for (const win of windows) {
-    if (!commonSignatures.has(win.key)) continue;
+    if (commonSignatures && !commonSignatures.has(win.key)) continue;
     for (let i = win.from; i <= win.to; i++) {
       marked[i] = true;
     }
@@ -412,9 +416,11 @@ function highlightSource(file, windows, commonSignatures) {
   return html + escapeHtml(file.source.slice(pos));
 }
 
-function showPair(pairIndex, scroll = true) {
+async function showPair(pairIndex, scroll = true) {
   const pair = pairs[pairIndex];
   if (!pair) return;
+  if (greedyRequest) greedyRequest.abort();
+  visiblePair = pair;
 
   $('comparePanel').classList.remove('hidden');$('pairTitle').textContent = `${pair.a.name} vs. ${pair.b.name}`;
   $('pairScore').textContent = `${pair.score.toFixed(1)}%`;
@@ -437,6 +443,53 @@ function showPair(pairIndex, scroll = true) {
 
   if (scroll) {
     $('comparePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  const status = $('greedyStatus');
+  const legend = $('fragmentLegend');
+  legend.textContent = 'Resaltado de secuencias compartidas del análisis original.';
+  status.textContent = 'Analizando bloques con Greedy…';
+  if (pair.a.tokens.length > 2000 || pair.b.tokens.length > 2000) {
+    status.textContent = 'Greedy admite hasta 2,000 tokens por programa. Se muestra el resaltado original.';
+    return;
+  }
+  const controller = new AbortController();
+  greedyRequest = controller;
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    if (!pair.greedy) {
+      const response = await fetch('/api/greedy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          tokens_a: pair.a.tokens.map(t => t.value),
+          tokens_b: pair.b.tokens.map(t => t.value),
+          min_length: Number($('gramSize').value)
+        })
+      });
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error('La API de Greedy no está disponible en este servidor.');
+      }
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'No se pudo completar el análisis.');
+      pair.greedy = result;
+    }
+    if (visiblePair !== pair || greedyRequest !== controller) return;
+    const result = pair.greedy;
+    const windows = key => result.blocks.map(block => ({
+      from: block[key], to: block[key] + block.length - 1
+    }));
+    $('codeA').innerHTML = highlightSource(pair.a, windows('a_start'), null);
+    $('codeB').innerHTML = highlightSource(pair.b, windows('b_start'), null);
+    status.textContent = `Cobertura Greedy: ${result.coverage.toFixed(1)}% · ${result.blocks.length} bloques · ${result.matched_tokens} tokens emparejados · mínimo ${result.min_length} tokens`;
+    legend.textContent = 'Greedy selecciona primero los bloques más largos y no reutiliza tokens. Su cobertura es independiente del porcentaje de similitud.';
+  } catch (err) {
+    if (visiblePair !== pair || greedyRequest !== controller) return;
+    status.textContent = (err.name === 'AbortError' ? 'Greedy superó el tiempo de espera.' : `Greedy: ${err.message}`) + ' Se muestra el resaltado original.';
+  } finally {
+    clearTimeout(timeout);
+    if (greedyRequest === controller) greedyRequest = null;
   }
 }
 
