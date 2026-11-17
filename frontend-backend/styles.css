@@ -148,6 +148,8 @@ h1 em {
 }
 
 .sub {
+  text-align: justify;
+  hyphens: none;
   max-width: 570px;
   margin: 0;
   padding-left: 18px;
@@ -174,13 +176,15 @@ h1 em {
 
 .research-note h2 {
   margin: 0 0 9px;
-  font: 700 22px/1.2 var(--title);
+  font: 700 clamp(28px, 3vw, 32px)/1.2 var(--title);
 }
 
 .research-note p {
-  margin: 0 0 10px;
-  font-size: 13px;
-  line-height: 1.65;
+  text-align: justify;
+  hyphens: none;
+  margin: 0 0 14px;
+  font-size: 15.5px;
+  line-height: 1.75;
 }
 
 .research-note p:last-child {
@@ -291,6 +295,26 @@ h1 em {
 }
 
 /* Paneles */
+.analyzer-heading {
+  margin: 48px 0 28px;
+  padding-top: 32px;
+  border-top: 1px solid var(--mauve);
+  scroll-margin-top: 24px;
+}
+
+.analyzer-heading h2 {
+  margin: 0;
+  color: var(--black);
+  font: 800 clamp(40px, 5vw, 72px)/1.04 var(--title);
+  letter-spacing: -0.5px;
+}
+
+.analyzer-heading h2 em {
+  color: var(--moon);
+  font-style: italic;
+  font-weight: 700;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(310px, 0.92fr);
