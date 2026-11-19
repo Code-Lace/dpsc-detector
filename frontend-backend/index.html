@@ -7,6 +7,7 @@
   <meta name="description" content="Proyecto CODE LACE: compara la similitud entre programas Python mediante normalización, secuencias de tokens y Merge Sort.">
   <title>Proyecto CODE LACE — Análisis de similitud</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="algorithms/greedy.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -35,6 +36,11 @@
         <p class="sub">
           Herramienta automatizada creada por <strong>Code Lace</strong> para combatir la ofuscación de variables y funciones en tareas de programación en <strong>Python, C y C++</strong>, optimizando el tiempo de los evaluadores académicos.
         </p>
+        <section class="research-note" aria-labelledby="research-title">
+          <h2 id="research-title">Estado del arte</h2>
+          <p>DPSC es una <strong>herramienta de apoyo a la detección de plagio</strong>. Antes de comparar, convierte el código en tokens —unidades como operadores, palabras clave e identificadores— y normaliza los nombres de variables y funciones. Así puede reconocer fragmentos equivalentes en su representación, aunque se hayan cambiado sus nombres.</p>
+          <p>El algoritmo <strong>Greedy busca primero los bloques coincidentes más largos</strong>, los selecciona y continúa con las partes restantes, sin reutilizar los tokens ya emparejados. De esta manera localiza y resalta fragmentos compartidos que ayudan a señalar posibles copias y a concentrar la revisión en las secciones relevantes.</p>
+        </section>
       </div>
       <div class="heroart" aria-hidden="true">
         <div class="poster-word">ANALIZA.<br>ORDENA.<br>COMPARA.</div>
@@ -49,7 +55,11 @@
       </div>
     </section>
 
-    <section class="layout">
+    <header id="analizador" class="analyzer-heading">
+      <h2 id="analyzer-title">DPSC <em>Detector</em></h2>
+    </header>
+
+    <section class="layout" aria-labelledby="analyzer-title">
       <article class="panel">
         <div class="headline">
           <h2>01. Archivos para comparar</h2>
@@ -113,7 +123,7 @@
           <button class="btn ghost full" id="exportBtn" type="button" disabled>⇩ Exportar resultados CSV</button>
         </div>
         <div class="info">
-          <strong>Privacidad:</strong> nada se sube a un servidor. Los archivos se procesan dentro de tu navegador y desaparecen al cerrar o recargar la página.
+          <strong>Privacidad:</strong> todo el análisis, incluido Greedy, se realiza en tu navegador. No se envían archivos ni tokens a un servidor y los programas no se ejecutan. Los datos desaparecen al cerrar o recargar la página.
         </div>
         <div class="info">
           <strong>Advertencia académica:</strong> similitud no equivale a plagio. Los resultados requieren interpretación humana, especialmente en tareas cortas o con instrucciones similares.
@@ -171,6 +181,7 @@
           <span class="score" id="pairScore">0%</span>
         </div>
         <div class="mini-details" id="pairMeta"></div>
+        <p id="greedyStatus" class="hint" role="status" aria-live="polite"></p>
         <div class="codes">
           <div class="codebox">
             <div class="codeheading" id="codeNameA">Archivo A</div>
@@ -182,7 +193,7 @@
           </div>
         </div>
         <div class="legend">
-          <i></i> Se resaltan fragmentos cuyos tokens normalizados aparecen en ambos códigos (no necesariamente texto idéntico).
+          <i></i> <span id="fragmentLegend">Se resaltan fragmentos cuyos tokens normalizados aparecen en ambos códigos.</span>
         </div>
       </div>
     </section>
