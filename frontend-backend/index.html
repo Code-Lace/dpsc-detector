@@ -72,11 +72,7 @@
           <strong>Arrastra tus archivos aquí</strong>
           <span>O haz clic para seleccionarlos · Máx. 30 archivos, 1 MB cada uno</span>
         </div>
-        <input id="fileInput" type="file" accept=".py, .c, .cpp, text/x-python, text/x-c, text/x-c++" multiple hidden>
-        
-        <div class="btnrow">
-          <button class="btn ghost" id="clearBtn" type="button" title="Eliminar archivos, código escrito y resultados">↺ Start Over</button>
-        </div>
+        <input type="file" id="file-input" multiple accept=".py,.c,.cpp," hidden />
         
         <div id="filesList" class="selected-files" aria-live="polite">
           <p class="empty">Todavía no has agregado archivos.</p>
