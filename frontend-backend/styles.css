@@ -913,6 +913,27 @@ mark {
   color: var(--blush);
 }
 
+/* Colores invertidos (de oscuro a claro) para la sección de Greedy */
+.method--reverse .step:nth-child(1) {
+  background: var(--black);
+  color: var(--blush);
+}
+
+.method--reverse .step:nth-child(2) {
+  background: var(--plum);
+  color: var(--blush);
+}
+
+.method--reverse .step:nth-child(3) {
+  background: var(--mauve);
+  color: var(--black);
+}
+
+.method--reverse .step:nth-child(4) {
+  background: var(--blush);
+  color: var(--black);
+}
+
 .step b {
   font: 600 12px/1.4 var(--ui);
   letter-spacing: 0.5px;
