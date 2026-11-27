@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="Proyecto CODE LACE: compara la similitud entre programas Python mediante normalización, secuencias de tokens y Merge Sort.">
+  <meta name="description" content="Proyecto CODE LACE: compara la similitud entre programas Python mediante normalización, secuencias de tokens,Merge Sort y Greedy Sort.">
   <title>Proyecto CODE LACE — Análisis de similitud</title>
   <link rel="stylesheet" href="styles.css">
   <script src="algorithms/greedy.js" defer></script>
@@ -48,8 +48,9 @@
         <div class="fakecode">
           <span class="dim">01</span> &nbsp;<span class="kw">IDENTIFICAR</span> TOKENS<br>
           <span class="dim">02</span> &nbsp;<span class="nm">NORMALIZAR</span> CÓDIGO<br>
-          <span class="dim">03</span> &nbsp;<span class="kw">MERGE SORT</span> ORDENAR<br>
-          <span class="dim">04</span> &nbsp;<span class="nm">COMPARAR</span> FRAGMENTOS
+          <span class="dim">03</span> &nbsp;<span class="kw">GREEDY SORT</span> BLOQUES<br>
+          <span class="dim">04</span> &nbsp;<span class="kw">MERGE SORT</span> ORDENAR<br>
+          <span class="dim">05</span> &nbsp;<span class="nm">COMPARAR</span> FRAGMENTOS
         </div>
         <div class="arrowtext">↗ PATRONES / COINCIDENCIAS / RESULTADOS</div>
       </div>
@@ -67,31 +68,32 @@
         </div>
         <p class="hint">Sube archivos Python, C o C++ o escribe tu propio código. Puedes combinar ambos métodos para comparar dos o más programas.</p>
         
-        <div id="dropzone" class="drop" role="button" tabindex="0" aria-label="Seleccionar o arrastrar archivos">
-          <div class="drop-icon">⇧</div>
-          <strong>Arrastra tus archivos aquí</strong>
-          <span>O haz clic para seleccionarlos · Máx. 30 archivos, 1 MB cada uno</span>
-        </div>
-        <input id="fileInput" type="file" accept=".py, .c, .cpp, text/x-python, text/x-c, text/x-c++" multiple hidden>
-        
-        <div class="btnrow">
-          <button class="btn ghost" id="clearBtn" type="button" title="Eliminar archivos, código escrito y resultados">↺ Start Over</button>
-        </div>
-        
-        <div id="filesList" class="selected-files" aria-live="polite">
-          <p class="empty">Todavía no has agregado archivos.</p>
-        </div>
-        <div id="fileError" class="error" role="alert"></div>
-        
-        <hr class="divider">
-        
-        <h2>O escribe tu código directamente</h2>
-        <p class="hint">Pega o escribe un programa Python, C o C++ y pulsa «Añadir código». Repite para comparar varios programas.</p>
-        
-        <div class="field">
-          <label class="label" for="snippetName">Nombre del archivo</label>
-          <input class="input" id="snippetName" maxlength="80" placeholder="archivo (opcional)">
-        </div>
+       <div id="dropzone" class="drop" role="button" tabindex="0" aria-label="Seleccionar o arrastrar archivos">
+      <div class="drop-icon">⇧</div>
+      <strong>Arrastra tus archivos aquí</strong>
+    <span>O haz clic para seleccionarlos · Máx. 30 archivos, 1 MB cada uno</span>
+      </div>
+      <input type="file" id="fileInput" multiple accept=".py,.c,.cpp" hidden />
+      <div id="toast-container" class="toast-container"></div>
+
+      <div class="btnrow">
+        <button class="btn ghost" id="clearBtn" type="button" title="Eliminar archivos, código escrito y resultados">↺ Start Over</button>
+      </div>
+
+      <div id="filesList" class="selected-files" aria-live="polite">
+        <p class="empty">Todavía no has agregado archivos.</p>
+      </div>
+      <div id="fileError" class="error" role="alert"></div>
+
+      <hr class="divider">
+
+      <h2>O escribe tu código directamente</h2>
+      <p class="hint">Pega o escribe un programa Python, C o C++ y pulsa «Añadir código». Repite para comparar varios programas.</p>
+
+      <div class="field">
+        <label class="label" for="snippetName">Nombre del archivo</label>
+        <input class="input" id="snippetName" maxlength="80" placeholder="archivo (opcional)">
+      </div>
         <div class="field">
           <label class="label" for="snippetCode">Código Python, C o C++</label>
           <textarea id="snippetCode" spellcheck="false" placeholder="Escribe o pega tu código Python, C o C++ aquí…"></textarea>
@@ -106,9 +108,9 @@
         <div class="field">
           <label class="label" for="gramSize">Tamaño de los fragmentos</label>
           <select id="gramSize">
-            <option value="3">3 tokens · Más sensible</option>
-            <option value="5" selected>5 tokens · Equilibrado</option>
-            <option value="7">7 tokens · Más estricto</option>
+            <option value="3">· Análisis Sencillo</option>
+            <option value="5" selected>· Análisis Equilibrado</option>
+            <option value="7">· Análisis Estricto</option>
           </select>
           <p class="hint" style="margin: 6px 0 0;">A mayor tamaño, se necesitan secuencias más largas para coincidir.</p>
         </div>
@@ -226,6 +228,34 @@
       </div>
     </section>
 
+    <section class="section">
+      <div class="sectiontitle">
+        <h2>¿Dónde entra el algoritmo Greedy?</h2>
+      </div>
+      <div class="method method--reverse">
+        <div class="step">
+          <b>01 · BUSCAR</b>
+          <h3>Bloques largos</h3>
+          <p>Localizar las secuencias coincidentes más extensas entre ambos programas.</p>
+        </div>
+        <div class="step">
+          <b>02 · ELEGIR</b>
+          <h3>Decisión voraz</h3>
+          <p>Seleccionar primero el bloque coincidente de mayor longitud disponible.</p>
+        </div>
+        <div class="step">
+          <b>03 · BLOQUEAR</b>
+          <h3>Sin reutilizar</h3>
+          <p>Marcar los tokens ya emparejados y continuar solo con las partes restantes.</p>
+        </div>
+        <div class="step">
+          <b>04 · RESALTAR</b>
+          <h3>Evidencia visual</h3>
+          <p>Mostrar los fragmentos compartidos para enfocar la revisión académica.</p>
+        </div>
+      </div>
+    </section>
+
     <section id="about-dpsc" class="panel section">
       <h2>Acerca del Proyecto DPSC</h2>
       <p class="hint">Solución integral desarrollada para entornos universitarios (CUCEI / Análisis de Algoritmos).</p>
@@ -253,7 +283,7 @@
         <div class="footer-brand-text">
           <span class="footer-kicker">AUTORÍA DEL PROYECTO</span>
           <strong>Creado por Code Lace</strong>
-          <small>Proyecto CODE LACE · DPSC & Merge Sort</small>
+          <small>Proyecto CODE LACE · DPSC · Merge Sort & Greedy Sort</small>
         </div>
       </div>
       <a href="https://github.com/Code-Lace/dpsc-detector" class="footer-github" target="_blank" rel="noopener">
