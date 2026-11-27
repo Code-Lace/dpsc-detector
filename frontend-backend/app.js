@@ -75,6 +75,32 @@ function tokenizeCode(source, ext) {
     '|=', '^=', '@=', ':=', '&&', '||', '++', '--', '::'
   ];
 
+  const skipLine = () => {
+    while (i < n && source[i] !== '\n') {
+      if (source[i] === '\\' && (source[i + 1] === '\n' || (source[i + 1] === '\r' && source[i + 2] === '\n'))) {
+        i += source[i + 1] === '\r' ? 3 : 2;
+        continue;
+      }
+      i++;
+    }
+  };
+  while (i < n) {
+    const start = i;
+    const c = source[i];
+
+    if (/\s/.test(c)) {
+      i++;
+      continue;
+    }
+    while (i < n) {
+    const start = i;
+    const c = source[i];
+
+    if (/\s/.test(c)) {
+      i++;
+      continue;
+    }
+
   while (i < n) {
     const start = i;
     const c = source[i];
@@ -84,13 +110,13 @@ function tokenizeCode(source, ext) {
       continue;
     }
 
-    if (isPy && c === '#') {
-      while (i < n && source[i] !== '\n') i++;
+    if (c === '#') {
+      skipLine();
       continue;
     }
 
     if (!isPy && c === '/' && source[i + 1] === '/') {
-      while (i < n && source[i] !== '\n') i++;
+      skipLine();
       continue;
     }
 
@@ -98,6 +124,17 @@ function tokenizeCode(source, ext) {
       i += 2;
       while (i < n && !(source[i - 1] === '*' && source[i] === '/')) i++;
       i++;
+      continue;
+    }
+    const rest = source.slice(i);
+
+    if (isPy && c === '#') {
+      while (i < n && source[i] !== '\n') i++;
+      continue;
+    }
+
+    if (!isPy && c === '/' && source[i + 1] === '/') {
+      while (i < n && source[i] !== '\n') i++;
       continue;
     }
 

@@ -1106,6 +1106,47 @@ mark {
 .top-nav a:hover {
   background: var(--plum);
 }
+#algoritmos,
+
+#about-dpsc {
+
+scroll-margin-top: 24px;
+
+}
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.about-card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--mauve);
+  transition: transform 0.15s ease;
+}
+.about-card strong {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--title);
+  font-size: 18px;
+}
+.about-card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.step {
+  transition: transform 0.15s ease;
+}
+
+.step:hover,
+.about-card:hover {
+  transform: translateY(-2px);
+}
+
 
 /* Adaptación a pantallas pequeñas */
 @media (max-width: 1100px) {
