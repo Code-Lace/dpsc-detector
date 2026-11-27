@@ -48,7 +48,7 @@
         <div class="fakecode">
           <span class="dim">01</span> &nbsp;<span class="kw">IDENTIFICAR</span> TOKENS<br>
           <span class="dim">02</span> &nbsp;<span class="nm">NORMALIZAR</span> CÓDIGO<br>
-          <span class="dim">03</span> &nbsp;<span class="kw">GRID SORT</span> ORDENAR<br>
+          <span class="dim">03</span> &nbsp;<span class="kw">GREEDY SORT</span> ORDENAR<br>
           <span class="dim">04</span> &nbsp;<span class="kw">MERGE SORT</span> ORDENAR<br>
           <span class="dim">05</span> &nbsp;<span class="nm">COMPARAR</span> FRAGMENTOS
         </div>
@@ -108,9 +108,9 @@
         <div class="field">
           <label class="label" for="gramSize">Tamaño de los fragmentos</label>
           <select id="gramSize">
-            <option value="3">3 tokens · Más sensible</option>
-            <option value="5" selected>5 tokens · Equilibrado</option>
-            <option value="7">7 tokens · Más estricto</option>
+            <option value="3">· Análisis Sencillo</option>
+            <option value="5" selected>· Análisis Equilibrado</option>
+            <option value="7">· Análisis Estricto</option>
           </select>
           <p class="hint" style="margin: 6px 0 0;">A mayor tamaño, se necesitan secuencias más largas para coincidir.</p>
         </div>
@@ -224,6 +224,34 @@
           <b>04 · COMPARAR</b>
           <h3>Dos punteros</h3>
           <p>Contar coincidencias en las listas ordenadas y calcular el porcentaje.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sectiontitle">
+        <h2>¿Dónde entra el algoritmo Greedy?</h2>
+      </div>
+      <div class="method method--reverse">
+        <div class="step">
+          <b>01 · BUSCAR</b>
+          <h3>Bloques largos</h3>
+          <p>Localizar las secuencias coincidentes más extensas entre ambos programas.</p>
+        </div>
+        <div class="step">
+          <b>02 · ELEGIR</b>
+          <h3>Decisión voraz</h3>
+          <p>Seleccionar primero el bloque coincidente de mayor longitud disponible.</p>
+        </div>
+        <div class="step">
+          <b>03 · BLOQUEAR</b>
+          <h3>Sin reutilizar</h3>
+          <p>Marcar los tokens ya emparejados y continuar solo con las partes restantes.</p>
+        </div>
+        <div class="step">
+          <b>04 · RESALTAR</b>
+          <h3>Evidencia visual</h3>
+          <p>Mostrar los fragmentos compartidos para enfocar la revisión académica.</p>
         </div>
       </div>
     </section>
