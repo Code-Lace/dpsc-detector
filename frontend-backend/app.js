@@ -339,10 +339,10 @@ function insertFile(name, source) {
 
   const parts = name.split('.');
   const ext = parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
-  const validExts = ['py', 'c', 'cpp', 'h', 'hpp'];
+  const validExts = ['py', 'c', 'cpp'];
 
   if (!validExts.includes(ext)) {
-    return `Formatos admitidos (.py, .c, .cpp, .h, .hpp): ${name}`;
+    return `Formatos admitidos (.py, .c, .cpp): ${name}`;
   }
   if (new Blob([source]).size > MAX_FILE_BYTES) {
     return `Archivo demasiado grande: ${name} (máximo 1 MB).`;
