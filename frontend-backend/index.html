@@ -67,24 +67,28 @@
         </div>
         <p class="hint">Sube archivos Python, C o C++ o escribe tu propio código. Puedes combinar ambos métodos para comparar dos o más programas.</p>
         
-        <div id="dropzone" class="drop" role="button" tabindex="0" aria-label="Seleccionar o arrastrar archivos">
-          <div class="drop-icon">⇧</div>
-          <strong>Arrastra tus archivos aquí</strong>
-          <span>O haz clic para seleccionarlos · Máx. 30 archivos, 1 MB cada uno</span>
-        </div>
-        <input type="file" id="file-input" multiple accept=".py,.c,.cpp," hidden />
-        
-        <div id="filesList" class="selected-files" aria-live="polite">
-          <p class="empty">Todavía no has agregado archivos.</p>
-        </div>
-        <div id="fileError" class="error" role="alert"></div>
+       <div id="dropzone" class="drop" role="button" tabindex="0" aria-label="Seleccionar o arrastrar archivos">
+      <div class="drop-icon">⇧</div>
+      <strong>Arrastra tus archivos aquí</strong>
+    <span>O haz clic para seleccionarlos · Máx. 30 archivos, 1 MB cada uno</span>
+      </div>
+      <input type="file" id="fileInput" multiple accept=".py,.c,.cpp," hidden />
         
         <hr class="divider">
         
-        <h2>O escribe tu código directamente</h2>
-        <p class="hint">Pega o escribe un programa Python, C o C++ y pulsa «Añadir código». Repite para comparar varios programas.</p>
-        
-        <div class="field">
+       <input type="file" id="fileInput" multiple accept=".py,.c,.cpp,.h,.hpp" hidden />
+      <div id="toast-container" class="toast-container"></div>
+
+      <div class="btnrow">
+        <button class="btn ghost" id="clearBtn" type="button" title="Eliminar archivos, código escrito y resultados">↺ Start Over</button>
+      </div>
+
+      <div id="filesList" class="selected-files" aria-live="polite">
+        <p class="empty">Todavía no has agregado archivos.</p>
+      </div>
+      <div id="fileError" class="error" role="alert"></div>
+
+      <hr class="divider">
           <label class="label" for="snippetName">Nombre del archivo</label>
           <input class="input" id="snippetName" maxlength="80" placeholder="archivo (opcional)">
         </div>
