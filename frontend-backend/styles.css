@@ -1113,6 +1113,13 @@ mark {
 scroll-margin-top: 24px;
 
 }
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
 
 /* Adaptación a pantallas pequeñas */
 @media (max-width: 1100px) {
