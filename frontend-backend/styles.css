@@ -1126,6 +1126,12 @@ scroll-margin-top: 24px;
   border: 1px solid var(--mauve);
   transition: transform 0.15s ease;
 }
+.about-card strong {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--title);
+  font-size: 18px;
+}
 
 
 /* Adaptación a pantallas pequeñas */
